@@ -191,6 +191,9 @@ def default_detection_configs():
   h.num_scales = 3
   # aspect ratio with format (w, h). Can be computed with k-mean per dataset.
   h.aspect_ratios = [(1.0, 1.0), (1.4, 0.7), (0.7, 1.4)]
+  h.use_kmeans = False
+  h.kmeans_ratios = None
+  
   h.anchor_scale = 4.0
   # is batchnorm training mode
   h.is_training_bn = True
