@@ -23,6 +23,7 @@ import tensorflow.compat.v1 as tf
 import anchors
 from object_detection import preprocessor
 from object_detection import tf_example_decoder
+import sys
 
 MAX_NUM_INSTANCES = 100
 
@@ -238,9 +239,11 @@ class InputReader(object):
     if params['use_kmeans']:
       input_anchors = anchors.KmeansAnchors(params['min_level'],
                                             params['max_level'],
+                                            params['num_scales'],
                                             params['kmeans_ratios'],
                                             params['anchor_scale'],
                                             params['image_size'])
+      tf.print(input_anchors, output_stream=sys.stderr, sep=',')                                     
     else:
       input_anchors = anchors.Anchors(params['min_level'], params['max_level'],
                                       params['num_scales'],
@@ -249,6 +252,10 @@ class InputReader(object):
                                       params['image_size'])
     
     anchor_labeler = anchors.AnchorLabeler(input_anchors, params['num_classes'])
+
+
+    tf.print(anchor_labeler, output_stream=sys.stderr, sep=',')
+
     example_decoder = tf_example_decoder.TfExampleDecoder()
 
     def _dataset_parser(value):
