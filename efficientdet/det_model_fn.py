@@ -142,6 +142,8 @@ def learning_rate_schedule(params, global_step):
 
 
 def focal_loss(logits, targets, alpha, gamma, normalizer):
+  print("Hello I am away to crash " + str(logits.shape))
+  print("Hello I am away to crash2 " + str(targets.shape))
   """Compute the focal loss between `logits` and the golden `target` values.
 
   Focal loss = -(1-pt)^gamma * log(pt)
@@ -268,16 +270,29 @@ def detection_loss(cls_outputs, box_outputs, labels, params):
   cls_losses = []
   box_losses = []
   box_iou_losses = []
+
+  print("-----------------Check code here for dumpage-------------------------")
+  print("total_levels: " + str(len(levels)))
+  print("total_labels: " + str(len(labels)))
+  print("cls_outputs: " + str(len(cls_outputs)))
+  print("box_outputs: " + str(len(box_outputs)))
+
   for level in levels:
+    print("level: " + str(level))
+    print("Labels at level: " + str(labels['cls_targets_%d' % level]))
     if params['data_format'] == 'channels_first':
       labels['cls_targets_%d' % level] = tf.transpose(
           labels['cls_targets_%d' % level], [0, 3, 1, 2])
       labels['box_targets_%d' % level] = tf.transpose(
           labels['box_targets_%d' % level], [0, 3, 1, 2])
+    
     # Onehot encoding for classification labels.
     cls_targets_at_level = tf.one_hot(
         labels['cls_targets_%d' % level],
         params['num_classes'])
+    
+    print("Class Targets at level: " + str(cls_targets_at_level))
+
     if params['data_format'] == 'channels_first':
       bs, _, width, height, _ = cls_targets_at_level.get_shape().as_list()
       cls_targets_at_level = tf.reshape(cls_targets_at_level,
@@ -286,7 +301,12 @@ def detection_loss(cls_outputs, box_outputs, labels, params):
       bs, width, height, _, _ = cls_targets_at_level.get_shape().as_list()
       cls_targets_at_level = tf.reshape(cls_targets_at_level,
                                         [bs, width, height, -1])
+    
+    
     box_targets_at_level = labels['box_targets_%d' % level]
+    
+    print("Class outputs at level: " + str(cls_outputs[level]))
+    
     cls_loss = _classification_loss(
         cls_outputs[level],
         cls_targets_at_level,
