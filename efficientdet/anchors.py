@@ -482,7 +482,7 @@ class Anchors(object):
 class KmeansAnchors(object):
   """RetinaNet Kmeans Anchors class."""
 
-  def __init__(self, min_level, max_level, kmeans_ratios,
+  def __init__(self, min_level, max_level, num_scales, kmeans_ratios,
                anchor_scale, image_size):
     """Constructs multiscale RetinaNet anchors.
     Args:
@@ -499,6 +499,7 @@ class KmeansAnchors(object):
     self.max_level = max_level
     self.kmeans_ratios = kmeans_ratios
     self.anchor_scale = anchor_scale
+    self.num_scales = num_scales
     self.image_size = utils.parse_image_size(image_size)
     self.feat_sizes = utils.get_feat_sizes(image_size, max_level)
     self.config = self._generate_configs()
@@ -519,7 +520,7 @@ class KmeansAnchors(object):
   def _generate_boxes(self):
     """Generates multiscale anchor boxes."""
     boxes_all = []
-    for _, configs in self.anchor_configs.items():
+    for _, configs in self.config.items():
       boxes_level = []
       for config in configs:
         stride, kmeans_ratio = config
@@ -547,7 +548,7 @@ class KmeansAnchors(object):
     return anchor_boxes
 
   def get_anchors_per_location(self):
-    return self.num_scales * len(self.aspect_ratios)
+    return self.num_scales * len(self.kmeans_ratios)
 
 class AnchorLabeler(object):
   """Labeler for multiscale anchor boxes."""
